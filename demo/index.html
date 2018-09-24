@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="da" style="font-size: 100%">
+<head>
+	<title>fcoo.dk - niord - Demo</title>
+	<meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta http-equiv='x-dns-prefetch-control' content='on'>
+
+	<meta name='copyright' content='FCOO'>
+	<meta name='owner' content='FCOO'>
+
+  <link  href="bower_components.css" rel="stylesheet">
+
+</head>
+
+<body>
+	<script src="bower_components.js"></script>
+	<script src="../src/niord.js"></script>
+	<!-- <script src="pdfobject.js"></script> -->
+	<script>
+        Promise.defaultErrorHandler = function( reason, url ){
+            console.log(reason, url);
+        };
+
+        window.Niord.getMessages('niord-nw',
+            function( data ){ console.log( 'ALL', data ); },
+            function( domain){ console.log( domain+' failed'); }
+        );
+
+        window.Niord.getPublications(
+            function( data ){ console.log( 'PUB', data ); },
+            function( domain){ console.log( 'PUB failed'); }
+        );
+
+
+    window.setTimeout( function(){
+        window.Niord.messages.getMessages('niord-fe',
+            function( data ){ console.log( 'fe',data ); }
+        );
+        window.Niord.publications.getPublications(
+            function( data ){ console.log( '2. PUB', data ); }
+        );
+
+    }, 2000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "name": "niord",
+  "version": "1.0.0",
+  "homepage": "https://github.com/FCOO/niord",
+  "authors": [
+    "Niels Holt"
+  ],
+  "description": "",
+  "main": "dist/niord.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/FCOO/niord.git"
+  },
+  "dependencies": {
+    "jquery": "latest",
+    "promise-get": "fcoo/promise-get#^1.0.1",
+    "moment": "latest"
+  },
+  "devDependencies": {},
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "moduleType": [
+    "es6"
+  ]
+}
