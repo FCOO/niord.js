@@ -215,7 +215,7 @@
                 {listId: 'charts',      getMethodId  : 'getChart',     idId: 'chartNumber' },
                 {listId: 'references',  getMethodId  : 'getReference', idId: 'messageId'   },
                 {listId: 'attachments', constructorId: 'Attachment'                        },
-                {listId: 'parts',       constructorId: 'MessagePart',  idId: 'indexNo'     },
+                {listId: 'parts',       constructorId: 'MessagePart',  idId: 'type'        },
             ];
 
         $.each( listInfos, function( index, listInfo ){
