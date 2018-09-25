@@ -53,14 +53,6 @@
     }
 
     /********************************************
-    domainId( str ) - Return 'nw', 'nm', 'fa' or 'fe' from a domain or serieId
-    ********************************************/
-    function domainId( str ){
-        return str.split('-')[1];
-    }
-
-
-    /********************************************
     arrayToPhrases( content ) - Convert contentArray
     from    [] of { lang:STRING, id1:content1_lang, id2:content2_lang,.. idN:contentN_lang }
     to      {
@@ -195,7 +187,17 @@
         var _this = this;
         //Standard properties
         $.each(['id', 'shortId', 'type', 'mainType', 'number', 'status', 'originalInformation', 'horizontalDatum'], function( dummy, id ){ _this[id] = data[id]; });
+
+        //serieId = e.q.'dma-fa' => domainId = 'FA'
         this.serieId  = data.messageSeries.seriesId;
+        var temp = this.serieId.toUpperCase().split('-');
+        this.domainId = 'NW'; //Default
+        $.each( ['NW', 'NM', 'FA', 'FE'], function( index, code ){
+            if (temp.indexOf(code) > -1 ){
+                _this.domainId = code;
+                return false;
+            }
+        });
 
         //DateTime-properties get converted to moment-object
         $.each(['created', 'updated', 'publishDateFrom', 'publishDateTo'], function( dummy, id ){
@@ -327,7 +329,7 @@
             this.domainList = {};
             this.domainList['ALL'] = [];
             $.each( this.childList, function( index, message ){
-                var id = domainId(message.serieId);
+                var id = message.domainId;
                 _this.domainList[id] = _this.domainList[id] ? _this.domainList[id] : [];
                 _this.domainList[id].push( message );
                 _this.domainList['ALL'].push( message );
@@ -339,7 +341,7 @@
         _resolveObj - Get messages for one resolve-function and call it
         *************************************************/
         _resolveObj: function( obj ){
-            var id = obj.domain ? domainId(obj.domain) : 'ALL';
+            var id = obj.domain ? obj.domain : 'ALL';
             obj.resolve( this.domainList[id], obj.domain );
         },
 
