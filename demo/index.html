@@ -23,22 +23,30 @@
         };
 
         window.Niord.getMessages('',
-            function( data ){ console.log( 'ALL', data ); },
+            function( data ){
+                //console.log( 'ALL', data );
+            },
             function( domain){ console.log( domain+' failed'); }
         );
 
         window.Niord.getPublications(
-            function( data ){ console.log( 'PUB', data ); },
+            function( data ){
+                //console.log( 'PUB', data );
+            },
             function( domain){ console.log( 'PUB failed'); }
         );
 
 
     window.setTimeout( function(){
         window.Niord.messages.getMessages('FE',
-            function( data ){ console.log( 'FE=',data ); }
+            function( data ){
+                console.log( 'FE=',data );
+            }
         );
         window.Niord.publications.getPublications(
-            function( data ){ console.log( '2. PUB', data ); }
+            function( data ){
+                //console.log( '2. PUB', data );
+            }
         );
 
     }, 2000);

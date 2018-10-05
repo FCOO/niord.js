@@ -20,6 +20,7 @@
         "camelcase"               : "off",
         "no-mixed-spaces-and-tabs": "warn",
         "semi"                    : "warn",
-        "no-extra-semi"           : "warn"
+        "no-extra-semi"           : "warn",
+        "no-useless-escape"       : "off"
     }
 }

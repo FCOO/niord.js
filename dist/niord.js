@@ -35,7 +35,14 @@
         dateFormatParam = '?dateFormat=UNIX_EPOCH',
         messagesUrl     = baseUrl + 'messages',
         publicationsUrl = baseUrl + 'publications' + dateFormatParam,
-        domainParam     = '&domain=';
+        domainParam     = '&domain=',
+
+        domainDefaultShortTitle = {
+            'FA': {da: 'Skydeområde', en: 'Firing Area'},
+            'FE': {da: "Skydeøvelser. Advarsel", en: "Firing exercises. Warning"}
+        };
+
+
 
     /********************************************
     domainUrl( domains ) - Return the url to retrive info from one or more domain(s)
@@ -91,7 +98,9 @@
         this.parent = data.parent ? messages.getArea( data.parent.id, data.parent ) : null;
     };
     ns.Area.prototype = {
-
+        getLevel: function(){
+            return this.parent ? this.parent.getLevel()+1 : 0;
+        }
     };
 
     /***********************************************************
@@ -210,28 +219,87 @@
 
         //Convert different lists
         var listInfos = [
-                {listId: 'areas',       getMethodId  : 'getArea'                           },
-                {listId: 'categories',  getMethodId  : 'getCategory'                       },
-                {listId: 'charts',      getMethodId  : 'getChart',     idId: 'chartNumber' },
-                {listId: 'references',  getMethodId  : 'getReference', idId: 'messageId'   },
-                {listId: 'attachments', constructorId: 'Attachment'                        },
-                {listId: 'parts',       constructorId: 'MessagePart',  idId: 'type'        },
+                {listId: 'areaList',       objectId: 'areas',       getMethodId  : 'getArea'                           },
+                {listId: 'categoryList',   objectId: 'categories',  getMethodId  : 'getCategory'                       },
+                {listId: 'chartList',      objectId: 'charts',      getMethodId  : 'getChart',     idId: 'chartNumber' },
+                {listId: 'referenceList',  objectId: 'references',  getMethodId  : 'getReference', idId: 'messageId'   },
+                {listId: 'attachmentList', objectId: 'attachments', constructorId: 'Attachment'                        },
+                {listId: 'partList',       objectId: 'parts',       constructorId: 'MessagePart',  idId: 'type'        },
             ];
 
         $.each( listInfos, function( index, listInfo ){
-            _this[listInfo.listId] = {};
+            _this[listInfo.objectId] = {};
+            _this[listInfo.listId] = [];
             var idId = listInfo.idId || 'id',
                 listIndex = 0;
-            $.each( data[listInfo.listId] || [], function( index, data ){
+            $.each( data[listInfo.objectId] || [], function( index, data ){
                 //If a get-function is given; use it ELSE crerate only 'local'
                 var id = data[idId] || listIndex++,
                     child = listInfo.getMethodId ? _this.messages[listInfo.getMethodId]( id, data ) : new ns[listInfo.constructorId]( data, _this.messages );
 
                 child.id = id;
                 child.message = _this;
-                _this[listInfo.listId][id] = child;
+                _this[listInfo.objectId][id] = child;
+                _this[listInfo.listId].push(child);
             });
         });
+
+
+        //Create areaLevelList = [level] of [] of Area
+        this.areaLevelList = [];
+        $.each( this.areaList, function( index, area ){
+            while (area){
+                while ( _this.areaLevelList.length <= area.getLevel() )
+                    _this.areaLevelList.push([]);
+                _this.areaLevelList[area.getLevel()].push(area);
+                area = area.parent;
+            }
+        });
+
+        //Craete mainArea = [] of the first level-0 area and its level-1 area (if any)
+        this.mainArea     = [];
+        this.mainAreaName = [];
+        this.mainArea.push( this.areaLevelList[0][0] );
+        $.each( this.areaLevelList[1], function( index, area ){
+            if (area.parent === _this.mainArea[0]){
+                _this.mainArea.push( area );
+                return false;
+            }
+        });
+        $.each( this.mainArea, function( index, area ){ _this.mainAreaName.push( area.name ); });
+
+        //Try to separate areas from this.title to get the rest as a small title. Not pretty :-)
+        function getShortTitle(lang, mess){
+            var shortTitle = '',
+                areaTitle  = '';
+            function add( text ){
+                if (text)
+                    areaTitle = (areaTitle ? areaTitle + '. ':'') + text;
+            }
+            $.each(mess.areaLevelList, function( index, areaList ){
+                $.each(areaList, function( index, area ){
+                    add( area.name[lang] );
+                });
+            });
+            if (mess.vicinity)
+                add(mess.vicinity[lang]);
+
+            var title = $.trim(mess.title[lang]);
+            areaTitle = $.trim(areaTitle);
+
+            //If the first part of title == areaTitle => last part is shortTitle (trimmed for space and ".")
+            if (title.indexOf(areaTitle) == 0){
+                shortTitle = title.replace(areaTitle, '');
+
+                //Trim leading and trailing "."
+                shortTitle = shortTitle.replace(/^[\., ]+|[\., ]+$/g, "");
+            }
+
+            return shortTitle;
+        }
+        this.shortTitle = {da: getShortTitle('da', this), en: getShortTitle('en', this)};
+        if (!this.shortTitle.da && !this.shortTitle.en)
+            this.shortTitle = domainDefaultShortTitle[this.domainId];
     };
 
     ns.Message.prototype = {
