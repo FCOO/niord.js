@@ -256,6 +256,14 @@
             }
         });
 
+        //Remove any dublicates in this.areaLevelList[]
+        $.each( this.areaLevelList, function( index, areaList ){
+            _this.areaLevelList[index] =
+                areaList.filter( function(elem, pos, arr) {
+                    return arr.indexOf(elem) == pos;
+                });
+        });
+
         //Craete mainArea = [] of the first level-0 area and its level-1 area (if any)
         this.mainArea     = [];
         this.mainAreaName = [];
@@ -454,7 +462,7 @@
         /*************************************************
         getMessage - Return the message. If the messages is not in the list and a resolve functions is given: Try loading the message
         *************************************************/
-        getMessage( id, resolve, reject ){
+        getMessage: function( id, resolve, reject ){
             var result = this.messagesByShortId[id] || this.messages[id];
             if (!result && resolve){
                 var _this = this;
@@ -474,7 +482,7 @@
         /*************************************************
         getMessageList - Return a list of messages. Assume the messages are loaded
         *************************************************/
-        getMessageList( domains ){
+        getMessageList: function( domains ){
             var result = [];
             domains =   domains ? ($.isArray( domains ) ? domains.join(' ') : domains) : '';
             $.each(this.childList, function(index, message){
