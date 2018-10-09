@@ -40,8 +40,15 @@
         domainDefaultShortTitle = {
             'FA': {da: 'Skydeområde', en: 'Firing Area'},
             'FE': {da: "Skydeøvelser. Advarsel", en: "Firing exercises. Warning"}
-        };
+        },
 
+        messageIndex = 0;
+
+
+    //trim(str) trim str for leading and tail space and punctuation
+    function trim( str ){
+        return str.replace(/^[\., ]+|[\., ]+$/g, "");
+    }
 
 
     /********************************************
@@ -191,6 +198,7 @@
     ************************************************************
     ***********************************************************/
     ns.Message = function( data, messages ){
+        messageIndex ++;
         this.messages = messages;
 
         var _this = this;
@@ -233,7 +241,7 @@
             var idId = listInfo.idId || 'id',
                 listIndex = 0;
             $.each( data[listInfo.objectId] || [], function( index, data ){
-                //If a get-function is given; use it ELSE crerate only 'local'
+                //If a get-function is given; use it ELSE create only 'local'
                 var id = data[idId] || listIndex++,
                     child = listInfo.getMethodId ? _this.messages[listInfo.getMethodId]( id, data ) : new ns[listInfo.constructorId]( data, _this.messages );
 
@@ -264,7 +272,7 @@
                 });
         });
 
-        //Craete mainArea = [] of the first level-0 area and its level-1 area (if any)
+        //Create mainArea = [] of the first level-0 area and its level-1 area (if any)
         this.mainArea     = [];
         this.mainAreaName = [];
         this.mainArea.push( this.areaLevelList[0][0] );
@@ -275,6 +283,54 @@
             }
         });
         $.each( this.mainArea, function( index, area ){ _this.mainAreaName.push( area.name ); });
+
+
+        //Convert the html-strings in this.publication to list of {text:{da,en}, link:{da,en}}
+        this.publications = {};
+        var nextId = 0;
+
+        if (this.publication){
+            var tempPublication = {};
+            $.each(['da', 'en'], function( index, lang ){
+                $(_this.publication[lang] || '').each( function( index, elem ){
+                    var text = '', link = '', id = '';
+                    if (elem.nodeType == 1){
+                        var $elem = $(elem);
+                        text = trim($elem.text());
+
+                        id = $elem.attr('publication') || '_' + nextId++;
+                        link = $elem.attr('href') || '';
+                    }
+                    else
+                        if (elem.nodeType == 3){
+                            text = trim( elem.textContent.replace(/\u00a0/g, "") );
+                            id = '_' + nextId++;
+                        }
+                    if (text){
+                        //Update temp list of publications
+                        var publication = tempPublication[id] || {text:{da:'', en:''}, link:{da:'', en:''}};
+                        publication.text[lang] = text;
+                        publication.link[lang] = link;
+                        tempPublication[id] = publication;
+                    }
+                });
+            });
+
+            //Transform tempPublication to local and global list
+            $.each( tempPublication, function( id, pub ){
+                //If exact version of pub existe => use if, else create new version
+                var globalPub = _this.messages.publications[id];
+                if (globalPub && (pub.text.da == globalPub.text.da) && (pub.text.en == globalPub.text.en) && (pub.link.da == globalPub.link.da) && (pub.link.en == globalPub.link.en))
+                    pub = globalPub;
+                else {
+                    if (globalPub)
+                        id = id + '_' + messageIndex;
+                    _this.messages.publications[id] = pub;
+                }
+                _this.publications[id] = pub;
+            });
+        } //end of if (this.publication){
+
 
         //Try to separate areas from this.title to get the rest as a small title. Not pretty :-)
         function getShortTitle(lang, mess){
@@ -300,7 +356,7 @@
                 shortTitle = title.replace(areaTitle, '');
 
                 //Trim leading and trailing "."
-                shortTitle = shortTitle.replace(/^[\., ]+|[\., ]+$/g, "");
+                shortTitle = trim(shortTitle);
             }
 
             return shortTitle;
@@ -394,6 +450,7 @@
             this.references = {};
             this.categories = {};
             this.charts = {};
+            this.publications = {};
 
             //Create all Message
             $.each( data, function( index, messageData ){
@@ -410,7 +467,6 @@
                 _this.domainList[id].push( message );
                 _this.domainList['ALL'].push( message );
             });
-
         },
 
 		/*************************************************
@@ -429,7 +485,6 @@
             $.each( this.rejectList, function( index, rejectObj ){
                 rejectObj.reject( rejectObj.domain );
             });
-
         },
 
         /*************************************************
@@ -444,7 +499,6 @@
 
             if (!dontUpdateRef)
                 this._updateReferences();
-
         },
 
         /*************************************************
