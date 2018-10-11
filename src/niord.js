@@ -81,7 +81,7 @@
         $.each( contentArray, function( index, content ){
             var lang = content.lang;
             $.each( content, function( id, value ){
-                if (id != 'lang'){
+                if ((id != 'lang') && value){
                     result[id] = result[id] || {};
                     result[id][lang] = value;
                 }
@@ -252,7 +252,7 @@
             });
         });
 
-
+        //CREATE AND ADJUST AREA INFO
         //Create areaLevelList = [level] of [] of Area
         this.areaLevelList = [];
         $.each( this.areaList, function( index, area ){
@@ -273,8 +273,11 @@
         });
 
         //Create mainArea = [] of the first level-0 area and its level-1 area (if any)
+        //Create areaTitle = string with first two area-levels
+        //this.subAreaTitle = this.vicinity or level 2 of area
         this.mainArea     = [];
         this.mainAreaName = [];
+        this.areaTitle = {da:'', en:''};
         this.mainArea.push( this.areaLevelList[0][0] );
         $.each( this.areaLevelList[1], function( index, area ){
             if (area.parent === _this.mainArea[0]){
@@ -282,9 +285,16 @@
                 return false;
             }
         });
-        $.each( this.mainArea, function( index, area ){ _this.mainAreaName.push( area.name ); });
+        $.each( this.mainArea, function( index, area ){
+            _this.mainAreaName.push( area.name );
+            _this.areaTitle.da = _this.areaTitle.da + (index ? ' - ' : '') + area.name.da;
+            _this.areaTitle.en = _this.areaTitle.en + (index ? ' - ' : '') + area.name.en;
+        });
 
+        //this.subAreaTitle = this.vicinity or level 2 of area
+        this.subAreaTitle = this.vicinity || (this.areaLevelList.length > 2 ? this.areaLevelList[2][0].name : null);
 
+        //CREATE AND ADJUST PUBLICATION INFO
         //Convert the html-strings in this.publication to list of {text:{da,en}, link:{da,en}}
         this.publications = {};
         var nextId = 0;
@@ -332,6 +342,7 @@
         } //end of if (this.publication){
 
 
+        //CREATE SHORTTITLE
         //Try to separate areas from this.title to get the rest as a small title. Not pretty :-)
         function getShortTitle(lang, mess){
             var shortTitle = '',
@@ -364,6 +375,7 @@
         this.shortTitle = {da: getShortTitle('da', this), en: getShortTitle('en', this)};
         if (!this.shortTitle.da && !this.shortTitle.en)
             this.shortTitle = domainDefaultShortTitle[this.domainId];
+
     };
 
     ns.Message.prototype = {
