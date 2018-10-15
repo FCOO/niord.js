@@ -398,8 +398,10 @@
         init: function(){
             this.status = NOTHING;
             this.resolveList = [];  //List of functions to be called when data is loaded
-            this.rejectList = [];   //List of functions to be called when loading fails
-            this.childList = [];
+            this.rejectList  = [];   //List of functions to be called when loading fails
+            this.childList   = [];
+            this.messages          = {};
+            this.messagesByShortId = {};
         },
 
 		/*************************************************
