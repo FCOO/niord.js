@@ -376,7 +376,43 @@
         if (!this.shortTitle.da && !this.shortTitle.en)
             this.shortTitle = domainDefaultShortTitle[this.domainId];
 
-    };
+
+        //CREATE GEOJSON
+        var geoJSONList = [];
+        $.each(this.parts, function(id, part){
+            if (part.geometry)
+                geoJSONList.push(part.geometry);
+        });
+        this.geoJSON = geoJSONList.length ? window.GeoJSON.merge(geoJSONList) : null;
+
+        //Update properties of all feaature in this.geoJSON
+        if (this.geoJSON && this.geoJSON.features)
+            $.each( this.geoJSON.features, function(dummy, feature ){
+                var prop = feature.properties = feature.properties || {};
+                prop.niordMessage = _this;
+
+                //Convert properties name:da (if any) to name:{da, en}
+                if (prop['name:da'] || prop['name:en'])
+                    prop.name = {da: prop['name:da'] || '', en: prop['name:en'] || ''};
+
+                //Convert properties name:0:da, name:1:da,... (if any) to nameList: []{da, en}
+                var nameList = [], index = 0;
+                while (index >= 0){
+                    var da = prop['name:'+index+':da'],
+                        en = prop['name:'+index+':en'];
+                    if (da || en){
+                        nameList.push({da: da || '', en: en || ''});
+                        index++;
+                    }
+                    else
+                        index = -1;
+                }
+                if (nameList.length)
+                    prop.nameList = nameList;
+            });
+
+
+    }; //end of ns.Message
 
     ns.Message.prototype = {
     };

@@ -1,6 +1,6 @@
 {
   "name": "niord",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "homepage": "https://github.com/FCOO/niord",
   "authors": [
     "Niels Holt"
@@ -14,7 +14,8 @@
   "dependencies": {
     "jquery": "latest",
     "promise-get": "fcoo/promise-get#^1.0.1",
-    "moment": "latest"
+    "moment": "latest",
+    "geojson-utilities": "fcoo/geojson-utilities.js#^1.0.0"
   },
   "devDependencies": {},
   "license": "MIT",
