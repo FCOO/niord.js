@@ -385,8 +385,9 @@
         });
         this.geoJSON = geoJSONList.length ? window.GeoJSON.merge(geoJSONList) : null;
 
-        //Update properties of all feaature in this.geoJSON
-        if (this.geoJSON && this.geoJSON.features)
+        //Update properties of all feature in this.geoJSON
+        if (this.geoJSON && this.geoJSON.features){
+            var newFeatures = [];
             $.each( this.geoJSON.features, function(dummy, feature ){
                 var prop = feature.properties = feature.properties || {};
                 prop.niordMessage = _this;
@@ -402,15 +403,43 @@
                         en = prop['name:'+index+':en'];
                     if (da || en){
                         nameList.push({da: da || '', en: en || ''});
+                        delete prop['name:'+index+':da'];
+                        delete prop['name:'+index+':en'];
                         index++;
                     }
                     else
                         index = -1;
                 }
-                if (nameList.length)
-                    prop.nameList = nameList;
-            });
 
+                //If the feature is a multiPoint => convert it to NxPoint and copy properties and try to match name from nameList
+                if (feature.geometry.type == 'MultiPoint'){
+                    $.each( feature.geometry.coordinates, function( coorIndex, coor ){
+                        var newFeature = {
+                                type: "Feature",
+                                geometry: {
+                                    type: "Point",
+                                    coordinates: $.extend({}, coor)
+                                },
+                                properties: $.extend({}, prop)
+                            };
+
+                        //Use name from nameList (if any)
+                        if (!!nameList[coorIndex])
+                            newFeature.properties.name = nameList[coorIndex];
+
+                        newFeatures.push(newFeature);
+                    });
+                }
+                else {
+                    if (nameList.length)
+                        prop.nameList = nameList;
+
+                    newFeatures.push(feature);
+                }
+
+            });
+            this.geoJSON.features = newFeatures;
+        }
 
     }; //end of ns.Message
 

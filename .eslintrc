@@ -21,6 +21,7 @@
         "no-mixed-spaces-and-tabs": "warn",
         "semi"                    : "warn",
         "no-extra-semi"           : "warn",
-        "no-useless-escape"       : "off"
+        "no-useless-escape"       : "off",
+        "no-extra-boolean-cast"   : "off"
     }
 }
