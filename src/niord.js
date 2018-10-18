@@ -436,8 +436,14 @@
             this.resolveList = [];  //List of functions to be called when data is loaded
             this.rejectList  = [];   //List of functions to be called when loading fails
             this.childList   = [];
-            this.messages          = {};
+
+            this.messages = {};
             this.messagesByShortId = {};
+            this.areas = {};
+            this.references = {};
+            this.categories = {};
+            this.charts = {};
+            this.publications = {};
         },
 
 		/*************************************************
@@ -685,6 +691,7 @@
     ns.messages     = new ns.Messages();
     ns.publications = new ns.Publications();
 
+    ns.getMessage      = function( id, resolve, reject ){ return ns.messages.getMessage(id, resolve, reject); };
     ns.getMessages     = function( domain, resolve, reject ){ return ns.messages.getMessages(domain, resolve, reject); };
     ns.getPublications = function( resolve, reject ){ return ns.publications.getPublications(resolve, reject); };
 

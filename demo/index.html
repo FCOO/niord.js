@@ -22,6 +22,16 @@
             console.log(reason, url);
         };
 
+
+        window.Niord.getMessage('NM-768-18',
+            function( mess ){
+                console.log( 'NM-768-18', mess );
+            },
+            function( domain){ console.log( domain+' failed'); }
+        );
+
+
+
         window.Niord.getMessages('',
             function( data ){
                 console.log( 'ALL', data );
@@ -48,8 +58,9 @@
                 //console.log( '2. PUB', data );
             }
         );
-
     }, 2000);
+
+
     </script>
 </body>
 </html>
