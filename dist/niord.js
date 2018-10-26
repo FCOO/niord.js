@@ -411,8 +411,15 @@
                         index = -1;
                 }
 
+                //Set coordIndex for consistent
+                if (feature.geometry.type == 'Point')
+                    prop.coordIndex = prop.startCoordIndex;
+
                 //If the feature is a multiPoint => convert it to NxPoint and copy properties and try to match name from nameList
                 if (feature.geometry.type == 'MultiPoint'){
+                    var hasCoordIndex = $.type(feature.properties.startCoordIndex) == 'number',
+                        startCoordIndex = feature.properties.startCoordIndex;
+
                     $.each( feature.geometry.coordinates, function( coorIndex, coor ){
                         var newFeature = {
                                 type: "Feature",
@@ -426,6 +433,11 @@
                         //Use name from nameList (if any)
                         if (!!nameList[coorIndex])
                             newFeature.properties.name = nameList[coorIndex];
+
+                        //Set and inc coordIndex
+                        if (hasCoordIndex)
+                            newFeature.properties.coordIndex = startCoordIndex + coorIndex;
+
 
                         newFeatures.push(newFeature);
                     });
