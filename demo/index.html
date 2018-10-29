@@ -39,6 +39,15 @@
             function( domain){ console.log( domain+' failed'); }
         );
 
+        window.Niord.getMessages('FA FE',
+            function( data ){
+                console.log( 'FA FE', data );
+            },
+            function( domain){ console.log( domain+' failed'); }
+        );
+
+
+
         window.Niord.getPublications(
             function( data ){
                 //console.log( 'PUB', data );
@@ -51,6 +60,11 @@
         window.Niord.messages.getMessages('FE',
             function( data ){
                 console.log( 'FE=',data );
+            }
+        );
+        window.Niord.messages.getMessages('FA',
+            function( data ){
+                console.log( 'FA=',data );
             }
         );
         window.Niord.publications.getPublications(

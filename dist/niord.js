@@ -570,8 +570,20 @@
         _resolveObj - Get messages for one resolve-function and call it
         *************************************************/
         _resolveObj: function( obj ){
-            var id = obj.domain ? obj.domain : 'ALL';
-            obj.resolve( this.domainList[id], obj.domain );
+            var _this = this,
+                id = obj.domain ? obj.domain : 'ALL',
+                messageList = [];
+            if (id == 'ALL')
+                messageList = this.domainList[id];
+            else
+                //Find messagwes from one or more domain-id(s)
+                $.each( $.isArray(id) ? id : id.split(' '), function( index, id ){
+                    if (_this.domainList[id])
+                        $.each( _this.domainList[id], function( index, mess ){
+                            messageList.push( mess );
+                        });
+                });
+            obj.resolve( messageList, obj.domain );
         },
 
         /*************************************************

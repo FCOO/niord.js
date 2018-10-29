@@ -22,7 +22,7 @@ http://FCOO.github.io/niord/demo/ (see console)
 ## Usage
 
     window.Niord.getMessages(   //OR window.Niord.messages.getMessages( 
-        'niord-nm', //domain. Can be ''
+        'FA FE', //domain. Can be "FA", "FE", "NW", NM" or combi of these 
         function( list, domain ){
             //Do something with list
         },
