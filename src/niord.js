@@ -225,14 +225,14 @@
         //Default values
         this.horizontalDatum = this.horizontalDatum || 'WGS-84';
 
-        //Convert different lists
+        //Convert different simple lists
         var listInfos = [
                 {listId: 'areaList',       objectId: 'areas',       getMethodId  : 'getArea'                           },
                 {listId: 'categoryList',   objectId: 'categories',  getMethodId  : 'getCategory'                       },
                 {listId: 'chartList',      objectId: 'charts',      getMethodId  : 'getChart',     idId: 'chartNumber' },
                 {listId: 'referenceList',  objectId: 'references',  getMethodId  : 'getReference', idId: 'messageId'   },
                 {listId: 'attachmentList', objectId: 'attachments', constructorId: 'Attachment'                        },
-                {listId: 'partList',       objectId: 'parts',       constructorId: 'MessagePart',  idId: 'type'        },
+                {listId: 'partList',       objectId: 'parts',       constructorId: 'MessagePart',  idId: 'indexNo'     },
             ];
 
         $.each( listInfos, function( index, listInfo ){
@@ -250,6 +250,13 @@
                 _this[listInfo.objectId][id] = child;
                 _this[listInfo.listId].push(child);
             });
+        });
+
+        //Convert "partList" into lists named "[TYPE]List"
+        $.each(this.partList, function(index, part){
+            var listName = part.type.toLowerCase() + 'List',
+                list = _this[listName] = _this[listName] || [];
+            list.push( part );
         });
 
         //CREATE AND ADJUST AREA INFO
@@ -373,13 +380,14 @@
             return shortTitle;
         }
         this.shortTitle = {da: getShortTitle('da', this), en: getShortTitle('en', this)};
+
         if (!this.shortTitle.da && !this.shortTitle.en)
             this.shortTitle = domainDefaultShortTitle[this.domainId];
 
 
         //CREATE GEOJSON
         var geoJSONList = [];
-        $.each(this.parts, function(id, part){
+        $.each(this.partList, function(index, part){
             if (part.geometry)
                 geoJSONList.push(part.geometry);
         });
@@ -397,18 +405,17 @@
                     prop.name = {da: prop['name:da'] || '', en: prop['name:en'] || ''};
 
                 //Convert properties name:0:da, name:1:da,... (if any) to nameList: []{da, en}
-                var nameList = [], index = 0;
-                while (index >= 0){
+                var nameList = [];
+
+                var endIndex = prop.startCoordIndex + feature.geometry.coordinates.length;
+                for (var index = 0; index <= endIndex; index++ ){
                     var da = prop['name:'+index+':da'],
                         en = prop['name:'+index+':en'];
                     if (da || en){
-                        nameList.push({da: da || '', en: en || ''});
+                        nameList[index] = {da: da || '', en: en || ''};
                         delete prop['name:'+index+':da'];
                         delete prop['name:'+index+':en'];
-                        index++;
                     }
-                    else
-                        index = -1;
                 }
 
                 //Set coordIndex for consistent

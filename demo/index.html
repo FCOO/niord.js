@@ -23,15 +23,21 @@
         };
 
 
-        window.Niord.getMessage('NM-768-18',
+        window.Niord.getMessage('NM-620-18',
             function( mess ){
-                console.log( 'NM-768-18', mess );
+                console.log( 'NM-620-18', mess );
             },
             function( domain){ console.log( domain+' failed'); }
         );
 
+        window.Niord.getMessages('FE',
+            function( data ){
+                console.log( 'FE', data );
+            },
+            function( domain){ console.log( domain+' failed'); }
+        );
 
-
+/*
         window.Niord.getMessages('',
             function( data ){
                 console.log( 'ALL', data );
@@ -56,25 +62,25 @@
         );
 
 
-    window.setTimeout( function(){
-        window.Niord.messages.getMessages('FE',
-            function( data ){
-                console.log( 'FE=',data );
-            }
-        );
-        window.Niord.messages.getMessages('FA',
-            function( data ){
-                console.log( 'FA=',data );
-            }
-        );
-        window.Niord.publications.getPublications(
-            function( data ){
-                //console.log( '2. PUB', data );
-            }
-        );
-    }, 2000);
+        window.setTimeout( function(){
+            window.Niord.messages.getMessages('FE',
+                function( data ){
+                    console.log( 'FE=',data );
+                }
+            );
+            window.Niord.messages.getMessages('FA',
+                function( data ){
+                    console.log( 'FA=',data );
+                }
+            );
+            window.Niord.publications.getPublications(
+                function( data ){
+                    //console.log( '2. PUB', data );
+                }
+            );
+        }, 2000);
 
-
+*/
     </script>
 </body>
 </html>
