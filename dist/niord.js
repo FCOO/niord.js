@@ -285,7 +285,8 @@
         this.mainArea     = [];
         this.mainAreaName = [];
         this.areaTitle = {da:'', en:''};
-        this.mainArea.push( this.areaLevelList[0][0] );
+        if (this.areaLevelList.length)
+            this.mainArea.push( this.areaLevelList[0][0] );
         $.each( this.areaLevelList[1], function( index, area ){
             if (area.parent === _this.mainArea[0]){
                 _this.mainArea.push( area );

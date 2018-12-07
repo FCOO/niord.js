@@ -37,6 +37,12 @@
             function( domain){ console.log( domain+' failed'); }
         );
 
+        window.Niord.getMessages('FA FE NM NW',
+            function( data ){
+                console.log( 'FA FE NM NW', data );
+            },
+            function( domain){ console.log( domain+' failed'); }
+        );
 /*
         window.Niord.getMessages('',
             function( data ){
