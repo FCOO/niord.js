@@ -572,6 +572,11 @@
                 _this.domainList[id].push( message );
                 _this.domainList['ALL'].push( message );
             });
+
+
+            //Create tree-structure for areas and categories
+            this.areaTreeList     = this._createTree('areas');
+            this.categoryTreeList = this._createTree('categories');
         },
 
 		/*************************************************
@@ -676,8 +681,57 @@
         getCategory  : function(id, data){ return this._getFromList( id, data, 'categories',  'Category'   ); },
         getChart     : function(id, data){ return this._getFromList( id, data, 'charts',      'Chart'      ); },
         getReference : function(id, data){ return this._getFromList( id, data, 'references',  'Reference'  ); },
-    };
 
+
+        /*************************************************
+        _createTree(propertyId)
+        objects are this[propertyId] = {} of obj with obj.parent -> another obj
+        Return a [] of obj with obj.children = [] of obj (if any)
+        *************************************************/
+        _createTree: function(propertyId){
+            var objects = this[propertyId],
+                countId = 'number_of_children';
+
+            //Count no of message for each obj in objects
+            $.each(this.messages, function(id, message){
+                $.each(message[propertyId], function(id){
+                    var obj = objects[id];
+                    //Inc obj and all parent
+                    while (obj){
+                        obj[countId] = (obj[countId] || 0) + 1;
+                        obj = obj.parent;
+                    }
+                });
+            });
+
+            //First add level to all obj
+            $.each(objects, function(id, obj){
+                var level = 0,
+                    objParent = obj.parent;
+                while (objParent){
+                    level++;
+                    objParent = objParent.parent;
+                }
+                obj.level = level;
+            });
+
+            function getChildren( parent ){
+                var result = [];
+                $.each(objects, function(id, obj){
+                    if (obj.parent == parent){
+                        result.push(obj);
+                        obj.children = getChildren(obj);
+                    }
+                });
+                if (parent)
+                    parent.children = result;
+                return result;
+            }
+
+            return getChildren( null );
+
+        }
+    };
 
     /***********************************************************
     ************************************************************

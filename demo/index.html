@@ -43,6 +43,30 @@
             },
             function( domain){ console.log( domain+' failed'); }
         );
+
+        setTimeout(function(){
+            function printList( list, level ){
+                level = level || 0;
+                var str = '';
+                for (var i=0; i < list.length; i++){
+                    var str = '';
+                    for (var j=0; j < level; j++)
+                        str = str +'----';
+                    console.log(str + list[i].name.en+' : '+ list[i]['number_of_children']);
+                    printList(list[i].children, level+1);
+                }
+            }
+            console.log('*********************************************');
+            printList( Niord.messages.areaTreeList );
+            console.log('*********************************************');
+            printList( Niord.messages.categoryTreeList );
+
+
+        }, 2000);
+
+
+
+
 /*
         window.Niord.getMessages('',
             function( data ){
