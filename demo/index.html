@@ -40,9 +40,31 @@
         window.Niord.getMessages('FA FE NM NW',
             function( data ){
                 console.log( 'FA FE NM NW', data );
+                $.each(data, function(id, mess){
+                    console.log(mess.references);
+                });
             },
             function( domain){ console.log( domain+' failed'); }
         );
+
+        window.Niord.getMessage('NM-885-17',
+            function( mess ){
+                console.log('FOUND', mess);
+            },
+            function(){
+                console.log('ØV BØV');
+            }
+        );
+
+        window.Niord.getMessage('23c626d6-5f1f-4af8-b821-bc6173dc8518',
+            function( mess ){
+                console.log('FOUND', mess);
+            },
+            function(){
+                console.log('ØV BØV');
+            }
+        );
+
 
         setTimeout(function(){
             function printList( list, level ){

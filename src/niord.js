@@ -640,17 +640,22 @@
         *************************************************/
         getMessage: function( id, resolve, reject ){
             var result = this.messagesByShortId[id] || this.messages[id];
-            if (!result && resolve){
-                var _this = this;
-                Promise.getJSON(
-                    messageUrl( id ),
-                    {},
-                    function( data ){
-                        _this._addMessage( data );
-                        resolve( _this.getMessage(id) );
-                    },
-                    reject
-                );
+
+            if (resolve){
+                if (result)
+                    resolve( result );
+                else {
+                    var _this = this;
+                    Promise.getJSON(
+                        messageUrl( id ),
+                        {},
+                        function( data ){
+                            _this._addMessage( data );
+                            resolve( _this.getMessage(id) );
+                        },
+                        reject
+                    );
+                }
             }
             return result;
         },

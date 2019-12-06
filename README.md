@@ -26,7 +26,17 @@ http://FCOO.github.io/niord/demo/ (see console)
         function( list, domain ){
             //Do something with list
         },
-        function( domain ){
+        function(){
+            //Error when loading the messages
+        }
+    );
+
+    window.Niord.getMessage(   //OR window.Niord.messages.getMessage( 
+        'NM-885-17', //id or short-id
+        function( message ){
+            //Do something with message
+        },
+        function(){
             //Error when loading the messages
         }
     );
@@ -35,7 +45,7 @@ http://FCOO.github.io/niord/demo/ (see console)
         function( list ){
             //Do something with list
         },
-        function( domain ){
+        function(){
             //Error when loading the publications
         }
     );
