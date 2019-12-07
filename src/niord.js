@@ -38,8 +38,8 @@
         domainParam     = '&domain=',
 
         domainDefaultShortTitle = {
-            'FA': {da: 'Skydeområde', en: 'Firing Area'},
-            'FE': {da: "Skydeøvelser. Advarsel", en: "Firing exercises. Warning"}
+            'fa': {da: 'Skydeområde', en: 'Firing Area'},
+            'fe': {da: "Skydeøvelser. Advarsel", en: "Firing exercises. Warning"}
         },
 
         messageIndex = 0;
@@ -205,11 +205,11 @@
         //Standard properties
         $.each(['id', 'shortId', 'type', 'mainType', 'number', 'status', 'originalInformation', 'horizontalDatum'], function( dummy, id ){ _this[id] = data[id]; });
 
-        //serieId = e.q.'dma-fa' => domainId = 'FA'
+        //serieId = e.q.'dma-fa' => domainId = 'fa'
         this.serieId  = data.messageSeries.seriesId;
-        var temp = this.serieId.toUpperCase().split('-');
-        this.domainId = 'NW'; //Default
-        $.each( ['NW', 'NM', 'FA', 'FE'], function( index, code ){
+        var temp = this.serieId.toLowerCase().split('-');
+        this.domainId = 'nw'; //Default
+        $.each( ['nw', 'nm', 'fa', 'fe'], function( index, code ){
             if (temp.indexOf(code) > -1 ){
                 _this.domainId = code;
                 return false;

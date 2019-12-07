@@ -30,16 +30,16 @@
             function( domain){ console.log( domain+' failed'); }
         );
 
-        window.Niord.getMessages('FE',
+        window.Niord.getMessages('fe',
             function( data ){
-                console.log( 'FE', data );
+                console.log( 'fe', data );
             },
             function( domain){ console.log( domain+' failed'); }
         );
 
-        window.Niord.getMessages('FA FE NM NW',
+        window.Niord.getMessages('fa fe nm nw',
             function( data ){
-                console.log( 'FA FE NM NW', data );
+                console.log( 'fa fe nm nw', data );
                 $.each(data, function(id, mess){
                     console.log(mess.references);
                 });
@@ -97,9 +97,9 @@
             function( domain){ console.log( domain+' failed'); }
         );
 
-        window.Niord.getMessages('FA FE',
+        window.Niord.getMessages('fa fe',
             function( data ){
-                console.log( 'FA FE', data );
+                console.log( 'fa fe', data );
             },
             function( domain){ console.log( domain+' failed'); }
         );
@@ -115,14 +115,14 @@
 
 
         window.setTimeout( function(){
-            window.Niord.messages.getMessages('FE',
+            window.Niord.messages.getMessages('fe',
                 function( data ){
-                    console.log( 'FE=',data );
+                    console.log( 'fe=',data );
                 }
             );
-            window.Niord.messages.getMessages('FA',
+            window.Niord.messages.getMessages('fa',
                 function( data ){
-                    console.log( 'FA=',data );
+                    console.log( 'fa=',data );
                 }
             );
             window.Niord.publications.getPublications(
