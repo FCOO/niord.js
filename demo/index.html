@@ -22,6 +22,12 @@
             console.log(reason, url);
         };
 
+        window.Niord.getMessage('NM-141-20',
+            function( mess ){
+                console.log( 'NM-141-20', mess );
+            },
+            function( domain){ console.log( domain+' failed'); }
+        );
 
         window.Niord.getMessage('NM-082-19',
             function( mess ){

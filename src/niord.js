@@ -38,8 +38,10 @@
         domainParam     = '&domain=',
 
         domainDefaultShortTitle = {
-            'fa': {da: 'Skydeområde', en: 'Firing Area'},
-            'fe': {da: "Skydeøvelser. Advarsel", en: "Firing exercises. Warning"}
+            'nw': {da:'Navigationsadvarsel',        en:'Navigational Warning'},
+            'nm': {da:'Efterretning for Søfarende', en:'Notice to Mariners'},
+            'fa': {da: 'Skydeområde',               en: 'Firing Area'},
+            'fe': {da: "Skydeøvelser. Advarsel",    en: "Firing exercises. Warning"}
         },
 
         messageIndex = 0;
@@ -377,7 +379,6 @@
                 //Trim leading and trailing "."
                 shortTitle = trim(shortTitle);
             }
-
             return shortTitle;
         }
         this.shortTitle = {da: getShortTitle('da', this), en: getShortTitle('en', this)};
