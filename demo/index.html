@@ -19,14 +19,16 @@
 
 	<script>
         Promise.defaultErrorHandler = function( reason, url ){
-            console.log(reason, url);
+            console.log('defaultErrorHandler=',reason, url);
         };
 
-        window.Niord.getMessage('NM-141-20',
+        window.Niord.getMessage(
+            'NM-141-20',
             function( mess ){
                 console.log( 'NM-141-20', mess );
             },
-            function( domain){ console.log( domain+' failed'); }
+            function( domain){ console.log('Error (no defaultError)',  domain+' failed'); },
+            {useDefaultErrorHandler: false}
         );
 
         window.Niord.getMessage('NM-082-19',

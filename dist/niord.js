@@ -499,11 +499,11 @@
 		/*************************************************
         getMessages( domain, resolve, reject)
         *************************************************/
-        getMessages: function( domain, resolve, reject ){
-            this._getChildren(  domain, resolve, reject );
+        getMessages: function( domain, resolve, reject, promiseOptions ){
+            this._getChildren(  domain, resolve, reject, promiseOptions );
         },
 
-        _getChildren: function( domain, resolve, reject ){
+        _getChildren: function( domain, resolve, reject, promiseOptions ){
             var resolveObj = resolve ? {domain: domain, resolve: resolve} : null;
             if (resolveObj)
                 this.resolveList.push( resolveObj );
@@ -512,8 +512,8 @@
                 this.rejectList.push( rejectObj );
 
             switch (this.status){
-                case 'NOTHING': this.load(); break;
-                case 'LOADING':              break; //Nothing - just wait
+                case 'NOTHING': this.load(promiseOptions);  break;
+                case 'LOADING': /* Nothing - just wait */   break;
                 case 'LOADED' : resolveObj ? this._resolveObj( resolveObj ) : null; break;
                 case 'ERROR'  : rejectObj  ? resolveObj.reject( resolveObj.domain ) : null; break;
             }
@@ -522,11 +522,11 @@
         /*************************************************
         load
         *************************************************/
-        load: function(){
+        load: function(promiseOptions){
             this.status = LOADING;
             Promise.getJSON(
                 this.url,
-                {},
+                promiseOptions || {},
                 $.proxy( this._resolve, this),
                 $.proxy( this.reject, this)
             );
@@ -639,7 +639,7 @@
         /*************************************************
         getMessage - Return the message. If the messages is not in the list and a resolve functions is given: Try loading the message
         *************************************************/
-        getMessage: function( id, resolve, reject ){
+        getMessage: function( id, resolve, reject, promiseOptions ){
             var result = this.messagesByShortId[id] || this.messages[id];
 
             if (resolve){
@@ -649,7 +649,7 @@
                     var _this = this;
                     Promise.getJSON(
                         messageUrl( id ),
-                        {},
+                        promiseOptions || {},
                         function( data ){
                             _this._addMessage( data );
                             resolve( _this.getMessage(id) );
@@ -782,8 +782,8 @@
     //Extend the prototype
 	ns.Publications .prototype = $.extend({}, ns.Messages.prototype, {
 
-        getPublications: function(resolve, reject){
-            this._getChildren( '', resolve, reject );
+        getPublications: function(resolve, reject, promiseOptions){
+            this._getChildren( '', resolve, reject, promiseOptions );
         },
 
         resolve: function( data ){
@@ -812,9 +812,9 @@
     ns.messages     = new ns.Messages();
     ns.publications = new ns.Publications();
 
-    ns.getMessage      = function( id, resolve, reject ){ return ns.messages.getMessage(id, resolve, reject); };
-    ns.getMessages     = function( domain, resolve, reject ){ return ns.messages.getMessages(domain, resolve, reject); };
-    ns.getPublications = function( resolve, reject ){ return ns.publications.getPublications(resolve, reject); };
+    ns.getMessage      = function( id,     resolve, reject, promiseOptions ){ return ns.messages.getMessage         (id,     resolve, reject, promiseOptions); };
+    ns.getMessages     = function( domain, resolve, reject, promiseOptions ){ return ns.messages.getMessages        (domain, resolve, reject, promiseOptions); };
+    ns.getPublications = function(         resolve, reject, promiseOptions ){ return ns.publications.getPublications(        resolve, reject, promiseOptions); };
 
 }(jQuery, this, document));
 
