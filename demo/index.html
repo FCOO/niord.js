@@ -18,9 +18,14 @@
 	<script src="../src/niord.js"></script>
 
 	<script>
-        Promise.defaultErrorHandler = function( reason, url ){
+        window.Promise.defaultErrorHandler = function( reason, url ){
             console.log('defaultErrorHandler=',reason, url);
         };
+        window.Niord.defaultPromiseOptions = {useDefaultErrorHandler: false};
+        window.Niord.defaultErrorHandler = function(){
+            console.log('NIORD - Error');
+        };
+
 
         window.Niord.getMessage(
             'NM-141-20',

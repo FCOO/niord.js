@@ -13,11 +13,14 @@
 	"use strict";
 
     //Create namespace
-    window.Niord = window.Niord || {};
-	var ns = window.Niord,
+    var ns = window.Niord = window.Niord || {};
+
+    //Define default error-handler (reject) and default options for promise.
+    ns.defaultErrorHandler   = ns.defaultErrorHandler || null;
+    ns.defaultPromiseOptions = ns.defaultPromiseOptions || {};
 
     //Load status
-        NOTHING = 'NOTHING',
+    var NOTHING = 'NOTHING',
         LOADING = 'LOADING',
         LOADED  = 'LOADED',
         ERROR   = 'ERROR',
@@ -812,83 +815,32 @@
     ns.messages     = new ns.Messages();
     ns.publications = new ns.Publications();
 
-    ns.getMessage      = function( id,     resolve, reject, promiseOptions ){ return ns.messages.getMessage         (id,     resolve, reject, promiseOptions); };
-    ns.getMessages     = function( domain, resolve, reject, promiseOptions ){ return ns.messages.getMessages        (domain, resolve, reject, promiseOptions); };
-    ns.getPublications = function(         resolve, reject, promiseOptions ){ return ns.publications.getPublications(        resolve, reject, promiseOptions); };
+    ns.getMessage = function( id, resolve, reject, promiseOptions ){
+        return ns.messages.getMessage(
+            id,
+            resolve,
+            reject || ns.defaultErrorHandler,
+            promiseOptions || ns.defaultPromiseOptions
+        );
+    };
+    ns.getMessages = function( domain, resolve, reject, promiseOptions ){
+        return ns.messages.getMessages(
+            domain,
+            resolve,
+            reject || ns.defaultErrorHandler,
+            promiseOptions || ns.defaultPromiseOptions
+        );
+    };
+    ns.getPublications = function( resolve, reject, promiseOptions ){
+        return ns.publications.getPublications(
+            resolve,
+            reject || ns.defaultErrorHandler,
+            promiseOptions || ns.defaultPromiseOptions
+        );
+    };
+
+
+
 
 }(jQuery, this, document));
 
-
-/*
-{"id":"22c4b96b-b96c-4cd2-8db8-e203077c67df",
-"created":1549447675000,
-    "updated":1549543047000,
-    "messageSeries":{"seriesId":"dma-nm"},
-    "number":82,
-    "shortId":"NM-082-19",
-    "mainType":"NM",
-    "type":"TEMPORARY_NOTICE",
-    "status":"PUBLISHED",
-    "areas":[{"id":490,
-    "active":true,
-    "parent":{"id":453,
-    "mrn":"urn:mrn:iho:country:dk",
-    "active":true,
-    "descs":[{"lang":"da",
-    "name":"Danmark"},
-    {"lang":"en",
-    "name":"Denmark"}]},
-    "descs":[{"lang":"da",
-    "name":"Storebælt"},
-    {"lang":"en",
-    "name":"The Great Belt"}]}],
-    "charts":[{"chartNumber":"143",
-    "internationalNumber":1369,
-    "active":true,
-    "scale":50000},
-    {"chartNumber":"141",
-    "internationalNumber":1370,
-    "active":true,
-    "scale":75000},
-    {"chartNumber":"103",
-    "internationalNumber":1303,
-    "active":true,
-    "scale":200000}],
-    "publishDateFrom":1549543047000,
-    "followUpDate":1551394800000,
-    "originalInformation":true,
-    "parts":[{"indexNo":0,
-    "type":"DETAILS",
-    "eventDates":[{"allDay":false,
-    "fromDate":1549543047000}],
-    "geometry":{"type":"FeatureCollection",
-    "id":"eea6ce2a-9fd7-4459-a8b8-db3e76535e86",
-    "features":[{"type":"Feature",
-    "id":"1bc8ed5c-3911-4776-b95f-ccf750fbe329",
-    "geometry":{"type":"MultiPoint",
-    "coordinates":[[11.0355, 55.36250000000001], [11.0365,   55.32050000000001]]},
-    "properties":{"startCoordIndex":1}}]},
-    "descs":[{"lang":"da",
-    "subject":"Trafiksepareringssystem suspenderes midlertidigt",
-    "details":"<p><strong>Den 3. marts 2019</strong> vil trafiksepareringssystemet TSS \"Between Korsoer and Sprogoe\", mellem position 1) og 2), blive suspenderet i en periode p&aring; max. 3 timer.</p>\n<table class=\"position-table\">\n<tbody>\n<tr>\n<td class=\"pos-index\">1)</td>\n<td class=\"pos-col\">55&deg; 21, 75'N - 011&deg; 02, 13'E</td>\n</tr>\n<tr>\n<td class=\"pos-index\">2)</td>\n<td class=\"pos-col\">55&deg; 19, 23'N - 011&deg; 02, 19'E</td>\n</tr>\n</tbody>\n</table>\n<p>Det pr&aelig;cise tidspunkt for suspenderingen vil blive meddelt ved en navigationsadvarsel og p&aring; NAVTEX.</p>\n<p>Suspenderingen skyldes at fart&oslash;jet &raquo;PIONEERING SPIRIT&laquo; (9HA4112) skal passere i N-lig retning i den W-lige side af &Oslash;sterrenden.</p>\n<p>Skibsfarten anmodes om at vise hensyn ved passage.</p>"},
-    {"lang":"en",
-    "subject":"Traffic separation scheme to be temporarily suspended.",
-    "details":"<p><strong>On 3 March 2019</strong>,
-    the traffic separation scheme TSS \"Between Korsoer and Sprogoe\" will be suspended for a time period of max. 3 hours.</p>\n<table class=\"position-table\">\n<tbody>\n<tr>\n<td class=\"pos-index\">1)</td>\n<td class=\"pos-col\">55&deg; 21.75'N - 011&deg; 02.13'E</td>\n</tr>\n<tr>\n<td class=\"pos-index\">2)</td>\n<td class=\"pos-col\">55&deg; 19.23'N - 011&deg; 02.19'E</td>\n</tr>\n</tbody>\n</table>\n<p><span>The exact time of the suspension will be announced by a navigational warning and by NAVTEX.</span></p>\n<p>The suspension is due to the fact that the vessel <span>&raquo;PIONEERING SPIRIT&laquo; (9HA4112) will pass in a northbound direction in the western side of the &Oslash;sterrenden.</span></p>\n<p>Mariners are requested to pass with caution.</p>"}],
-    "hideSubject":true},
-    {"indexNo":0,
-    "type":"NOTE",
-    "descs":[{"lang":"da",
-    "details":"<p>Opdaterede oplysninger om suspenderingen kan f&aring;s ved henvendelse til Great Belt VTS p&aring; VHF kanal 11 og 74.&nbsp;</p>"},
-    {"lang":"en",
-    "details":"<p>Updated information of the suspension can be obtained by contacting Great Belt VTS on VHF channels 11 and 74.</p>"}]}],
-    "descs":[{"lang":"da",
-    "title":"Danmark. Storebælt. TSS \"Between Korsoer and Sprogoe\". Trafiksepareringssystem suspenderes midlertidigt.",
-    "vicinity":"TSS \"Between Korsoer and Sprogoe\"",
-    "publication":"Ships&rsquo; Routeing 2017 Edition",
-    "source":"SFS 4. februar 2019"},
-    {"lang":"en",
-    "title":"Denmark. The Great Belt. TSS \"Between Korsoer and Sprogoe\". Traffic separation scheme to be temporarily suspended.",
-    "vicinity":"TSS \"Between Korsoer and Sprogoe\"",
-    "publication":"Ships&rsquo; Routeing 2017 Edition","source":"DMA 4 February 2019"}]}
-    */
