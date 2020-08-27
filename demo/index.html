@@ -18,6 +18,7 @@
 	<script src="../src/niord.js"></script>
 
 	<script>
+function demo(){
         window.Promise.defaultErrorHandler = function( reason, url ){
             console.log('defaultErrorHandler=',reason, url);
         };
@@ -26,7 +27,13 @@
             console.log('NIORD - Error');
         };
 
-
+        window.Niord.getMessage(
+            '83d09fcf-6555-44dc-805d-270599acb8ce',
+            function( mess ){
+                console.log( mess );
+            },
+        );
+//return;
         window.Niord.getMessage(
             'NM-141-20',
             function( mess ){
@@ -146,6 +153,9 @@
         }, 2000);
 
 */
+
+}
+demo();
     </script>
 </body>
 </html>

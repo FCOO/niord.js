@@ -398,6 +398,33 @@
         });
         this.geoJSON = geoJSONList.length ? window.GeoJSON.merge(geoJSONList) : null;
 
+        //Create a list of all coordinates in the geoJSON (if any)
+        this.coordinatesList = [];
+
+        var tempList = [];
+        function getCoordinates( feature ){
+            if (typeof feature != 'object') return;
+            $.each(feature, function(id, content){
+                if (id == 'coordinates')
+                    tempList.push(content);
+                else
+                    getCoordinates(content);
+            });
+        }
+        var coordList = [];
+        function coordAll(index, list){
+            if ((list.length == 2) && (typeof list[0] == 'number'))
+                coordList.push(list);
+            else
+                $.each(list, coordAll );
+        }
+
+        if (this.geoJSON){
+            getCoordinates(this.geoJSON);
+            coordAll(0, tempList);
+            this.coordinatesList = coordList;
+        }
+
         //Update properties of all feature in this.geoJSON
         if (this.geoJSON && this.geoJSON.features){
             var newFeatures = [];
