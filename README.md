@@ -17,7 +17,7 @@ Create two global objects in namespace `window.Niord`:
 `bower install https://github.com/FCOO/niord.git --save`
 
 ## Demo
-http://FCOO.github.io/niord/demo/ (see console)
+http://FCOO.github.io/niord.js/demo/ (see console)
 
 ## Usage
 
