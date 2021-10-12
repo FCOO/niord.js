@@ -27,7 +27,8 @@
 
     //Default options and paths
         defaultOptions = {
-            domains: [
+            autoLoad: false, //If true the getMessage will automatic load data
+            domains : [
                 'niord-nw',   //All Danish navigational warnings are produced in the "niord-nw" domain.
                 'niord-nm',   //All Danish Notices to Mariners are produced in the "niord-nm" domain.
                 'niord-fa',   //All Danish firing areas are defined as miscellaneous Notices to Mariners in the "niord-fa" domain.
@@ -37,7 +38,7 @@
         baseUrl         = 'https://niord.dma.dk/rest/public/v1/',
         dateFormatParam = '?dateFormat=UNIX_EPOCH',
         messagesUrl     = baseUrl + 'messages',
-        publicationsUrl = baseUrl + 'publications' + dateFormatParam,
+        //publicationsUrl = baseUrl + 'publications' + dateFormatParam,
         domainParam     = '&domain=',
 
         domainDefaultShortTitle = {
@@ -59,17 +60,26 @@
     /********************************************
     domainUrl( domains ) - Return the url to retrive info from one or more domain(s)
     ********************************************/
-    function domainUrl( domains ){
+    ns.domainUrl = function( domains ){
         domains = $.isArray( domains ) ? domains : [domains];
         return messagesUrl + dateFormatParam + domainParam + domains.join(domainParam);
-    }
+    };
 
     /********************************************
-    messageUrl( id ) - Return the url to retrive info from one message
+    messageUrl( id ) - Return the url to retrive info from a single message
     ********************************************/
-    function messageUrl( id ){
+    ns.messageUrl = function( id ){
         return baseUrl + 'message/' + id + dateFormatParam;
-    }
+    };
+
+
+    /********************************************
+    publicationsUrl() - Return the url to retrive publications
+    ********************************************/
+    ns.publicationsUrl = function(){
+        return baseUrl + 'publications' + dateFormatParam;
+    };
+
 
     /********************************************
     arrayToPhrases( content ) - Convert contentArray
@@ -504,8 +514,7 @@
     ************************************************************
     ***********************************************************/
     ns.Messages = function( options ){
-        this.options = $.extend( defaultOptions, options || {} );
-        this.url = domainUrl(this.options.domains);
+        this.options = $.extend( true, {}, defaultOptions, options || {} );
         this.init();
     };
 
@@ -517,6 +526,8 @@
             this.rejectList  = [];   //List of functions to be called when loading fails
             this.childList   = [];
 
+            this.childResolveList = {}; //{ID: {resolve, reject, promiseOptions}} = Set of message-id and resolve-, reject-functions and promiseOptions to be called when the data is loaded
+
             this.messages = {};
             this.messagesByShortId = {};
             this.areas = {};
@@ -524,6 +535,11 @@
             this.categories = {};
             this.charts = {};
             this.publications = {};
+        },
+
+        getUrl: function( domain ){
+            var result = ns.domainUrl(domain || this.options.domains);
+            return result;
         },
 
 		/*************************************************
@@ -534,6 +550,9 @@
         },
 
         _getChildren: function( domain, resolve, reject, promiseOptions ){
+            reject         = reject         || ns.defaultErrorHandler;
+            promiseOptions = promiseOptions || ns.defaultPromiseOptions;
+
             var resolveObj = resolve ? {domain: domain, resolve: resolve} : null;
             if (resolveObj)
                 this.resolveList.push( resolveObj );
@@ -542,10 +561,19 @@
                 this.rejectList.push( rejectObj );
 
             switch (this.status){
-                case 'NOTHING': this.load(promiseOptions);  break;
-                case 'LOADING': /* Nothing - just wait */   break;
-                case 'LOADED' : resolveObj ? this._resolveObj( resolveObj ) : null; break;
-                case 'ERROR'  : rejectObj  ? resolveObj.reject( resolveObj.domain ) : null; break;
+                case 'NOTHING':
+                    if (this.options.autoLoad)
+                        this.load(promiseOptions);
+                    break;
+                case 'LOADING':
+                    /* Nothing - just wait */
+                    break;
+                case 'LOADED' :
+                    resolveObj ? this._resolveObj( resolveObj ) : null;
+                    break;
+                case 'ERROR'  :
+                    rejectObj  ? resolveObj.reject( resolveObj.domain ) : null;
+                    break;
             }
         },
 
@@ -553,9 +581,12 @@
         load
         *************************************************/
         load: function(promiseOptions){
+            if (this.status != NOTHING)
+                return this;
+
             this.status = LOADING;
             Promise.getJSON(
-                this.url,
+                this.getUrl(),
                 promiseOptions || {},
                 $.proxy( this._resolve, this),
                 $.proxy( this.reject, this)
@@ -570,9 +601,21 @@
             this.childList = [];
             this.resolve( data );
             this.status = LOADED;
+
+            this.ready = true;
+
+            //The resolve for domains
             $.each( this.resolveList, function( index, obj ){
                 _this._resolveObj( obj );
             });
+
+            //The resolve for single messages
+            $.each( this.childResolveList, function( id, opt ){
+                _this.getMessage(id, opt.resolve, opt.reject, opt.promiseOptions);
+            });
+
+            return this;
+
         },
 
         /*************************************************
@@ -620,7 +663,7 @@
             if (id == 'ALL')
                 messageList = this.domainList[id];
             else
-                //Find messagwes from one or more domain-id(s)
+                //Find messages from one or more domain-id(s)
                 $.each( $.isArray(id) ? id : id.split(' '), function( index, id ){
                     if (_this.domainList[id])
                         $.each( _this.domainList[id], function( index, mess ){
@@ -634,10 +677,21 @@
         reject - call reject-functions when loading fails
         *************************************************/
         reject: function(){
+            var _this = this;
+
             this.status = ERROR;
+            this.ready = true;
+
+            //The reject for domains
             $.each( this.rejectList, function( index, rejectObj ){
                 rejectObj.reject( rejectObj.domain );
             });
+
+            //The reject for single messages = try to load the individually
+            $.each( this.childResolveList, function( id, opt ){
+                _this.getMessage(id, opt.resolve, opt.reject, opt.promiseOptions);
+            });
+            return this;
         },
 
         /*************************************************
@@ -667,26 +721,48 @@
         },
 
         /*************************************************
-        getMessage - Return the message. If the messages is not in the list and a resolve functions is given: Try loading the message
+        getMessage - Return the message.
+        If the messages is not in the list and a resolve functions is given:
+            Try loading the message, or
+            Wait for the full list to be loaded
+
+
         *************************************************/
         getMessage: function( id, resolve, reject, promiseOptions ){
-            var result = this.messagesByShortId[id] || this.messages[id];
+            var _this = this,
+                result = this.messagesByShortId[id] || this.messages[id];
+
+            reject         = reject         || ns.defaultErrorHandler;
+            promiseOptions = promiseOptions || ns.defaultPromiseOptions;
 
             if (resolve){
                 if (result)
                     resolve( result );
-                else {
-                    var _this = this;
-                    Promise.getJSON(
-                        messageUrl( id ),
-                        promiseOptions || {},
-                        function( data ){
-                            _this._addMessage( data );
-                            resolve( _this.getMessage(id) );
-                        },
-                        reject
-                    );
-                }
+                else
+                    if (this.ready){
+                        //The data are loaded and do not contain the message => Try to load the message via single-message request
+                        Promise.getJSON(
+                            ns.messageUrl( id ),
+                            promiseOptions || {},
+                            function( data ){
+                                _this._addMessage( data );
+                                return _this.getMessage(id, resolve);
+                            },
+                            reject
+                        );
+                    }
+                    else {
+                        //Wait for this to load
+                        this.childResolveList[id] = {
+                            resolve: resolve,
+                            reject : reject,
+                            promiseOptions: promiseOptions
+                        };
+
+                        //If it is not loading => load it
+                        if (this.options.autoLoad && (this.status == NOTHING))
+                            this.load(promiseOptions);
+                    }
             }
             return result;
         },
@@ -804,13 +880,18 @@
     Publications
     ************************************************************
     ***********************************************************/
-    ns.Publications = function(){
-        this.url = publicationsUrl;
+    ns.Publications = function(options){
+        this.options = $.extend( true, {}, defaultOptions, options || {} );
+
         this.init();
     };
 
     //Extend the prototype
 	ns.Publications .prototype = $.extend({}, ns.Messages.prototype, {
+
+        getUrl: function(){
+            return ns.publicationsUrl();
+        },
 
         getPublications: function(resolve, reject, promiseOptions){
             this._getChildren( '', resolve, reject, promiseOptions );
@@ -838,34 +919,13 @@
     });
 
 
-    //Create public object and methods
-    ns.messages     = new ns.Messages();
-    ns.publications = new ns.Publications();
-
-    ns.getMessage = function( id, resolve, reject, promiseOptions ){
-        return ns.messages.getMessage(
-            id,
-            resolve,
-            reject || ns.defaultErrorHandler,
-            promiseOptions || ns.defaultPromiseOptions
-        );
-    };
-    ns.getMessages = function( domain, resolve, reject, promiseOptions ){
-        return ns.messages.getMessages(
-            domain,
-            resolve,
-            reject || ns.defaultErrorHandler,
-            promiseOptions || ns.defaultPromiseOptions
-        );
-    };
-    ns.getPublications = function( resolve, reject, promiseOptions ){
-        return ns.publications.getPublications(
-            resolve,
-            reject || ns.defaultErrorHandler,
-            promiseOptions || ns.defaultPromiseOptions
-        );
+    ns.messages = function(options){
+        return new ns.Messages(options);
     };
 
+    ns.publications  = function(options){
+        return new ns.Publications(options);
+    };
 
 
 

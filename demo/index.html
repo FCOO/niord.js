@@ -18,7 +18,18 @@
 	<script src="../src/niord.js"></script>
 
 	<script>
-function demo(){
+        //Overwrite window.Niord.domainUrl to get alternative url 
+        window.Niord.domainUrl = function( _domainUrl ){
+            return function(){
+                var result = _domainUrl.apply(this, arguments);
+
+                //Adjust result...
+
+                return result;
+            }
+        }(window.Niord.domainUrl);
+        
+
         window.Promise.defaultErrorHandler = function( reason, url ){
             console.log('defaultErrorHandler=',reason, url);
         };
@@ -27,13 +38,44 @@ function demo(){
             console.log('NIORD - Error');
         };
 
-        window.Niord.getMessage(
+
+        var niord_messages = window.Niord.messages({autoLoad: true});
+
+//*
+        niord_messages.getMessage(
+            '0cbef75e-15ef-470c-a098-04f6c59243be',
+            function( mess ){
+                console.log( '>>>>>>>>>>>>>>>>>> SINGLE EXSTISTING MESSAGE:', mess );
+            },
+            null, null, 'FROM index.html'
+        );
+
+//*/
+
+//*
+        niord_messages.getMessage(
             '83d09fcf-6555-44dc-805d-270599acb8ce',
             function( mess ){
-                console.log( mess );
+                console.log( '>>>>>>>>>>>>>>>>>> SINGLE CANCELLED MESSAGE:', mess );
             },
+            null, null, 'FROM index.html'
         );
-//return;
+//*/
+
+//*
+        niord_messages.getMessages('',
+            function( data ){
+                console.log( '>>>>>>>>>>>>>>>>>> ALL MESSAGES', data );
+            },
+            function( domain){ console.log( domain+' failed'); }
+        );
+
+//*/
+        //niord_messages.load();
+
+
+
+/*
         window.Niord.getMessage(
             'NM-141-20',
             function( mess ){
@@ -61,7 +103,7 @@ function demo(){
             function( data ){
                 console.log( 'fa fe nm nw', data );
                 $.each(data, function(id, mess){
-                    console.log(mess.references);
+                    //console.log(mess.references);
                 });
             },
             function( domain){ console.log( domain+' failed'); }
@@ -84,30 +126,7 @@ function demo(){
                 console.log('ØV BØV');
             }
         );
-
-
-        setTimeout(function(){
-            function printList( list, level ){
-                level = level || 0;
-                var str = '';
-                for (var i=0; i < list.length; i++){
-                    var str = '';
-                    for (var j=0; j < level; j++)
-                        str = str +'----';
-                    console.log(str + list[i].name.en+' : '+ list[i]['number_of_children']);
-                    printList(list[i].children, level+1);
-                }
-            }
-            console.log('*********************************************');
-            printList( Niord.messages.areaTreeList );
-            console.log('*********************************************');
-            printList( Niord.messages.categoryTreeList );
-
-
-        }, 2000);
-
-
-
+//*
 
 /*
         window.Niord.getMessages('',
@@ -123,39 +142,19 @@ function demo(){
             },
             function( domain){ console.log( domain+' failed'); }
         );
+*/
 
-
-
-        window.Niord.getPublications(
+/*
+        //Load publications
+        var niord_publications = window.Niord.publications({autoLoad: true});
+        niord_publications.getPublications(
             function( data ){
-                //console.log( 'PUB', data );
+                console.log( 'PUB', data );
             },
             function( domain){ console.log( 'PUB failed'); }
         );
-
-
-        window.setTimeout( function(){
-            window.Niord.messages.getMessages('fe',
-                function( data ){
-                    console.log( 'fe=',data );
-                }
-            );
-            window.Niord.messages.getMessages('fa',
-                function( data ){
-                    console.log( 'fa=',data );
-                }
-            );
-            window.Niord.publications.getPublications(
-                function( data ){
-                    //console.log( '2. PUB', data );
-                }
-            );
-        }, 2000);
-
 */
 
-}
-demo();
     </script>
 </body>
 </html>
