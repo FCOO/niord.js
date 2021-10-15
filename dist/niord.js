@@ -28,10 +28,10 @@
     //Default options and paths
         defaultOptions = {
             domains : [
-                'niord-nw',   //All Danish navigational warnings are produced in the "niord-nw" domain.
-                'niord-nm',   //All Danish Notices to Mariners are produced in the "niord-nm" domain.
-                'niord-fa',   //All Danish firing areas are defined as miscellaneous Notices to Mariners in the "niord-fa" domain.
-                'niord-fe'    //The actual firing exercises are maintained as local navigational warnings in the "niord-fe" domain.
+                'nw',   //All Danish navigational warnings are produced in the "niord-nw" domain.
+                'nm',   //All Danish Notices to Mariners are produced in the "niord-nm" domain.
+                'fa',   //All Danish firing areas are defined as miscellaneous Notices to Mariners in the "niord-fa" domain.
+                'fe'    //The actual firing exercises are maintained as local navigational warnings in the "niord-fe" domain.
             ]
         },
         baseUrl         = 'https://niord.dma.dk/rest/public/v1/',
@@ -61,6 +61,12 @@
     ********************************************/
     ns.domainUrl = function( domains ){
         domains = $.isArray( domains ) ? domains : domains.split(' ');
+
+        //domains need prefix "niord-" in api call
+        $.each(domains, function(index, id){
+            domains[index] = 'niord-'+id;
+        });
+
         return messagesUrl + dateFormatParam + domainParam + domains.join(domainParam);
     };
 
