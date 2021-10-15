@@ -27,7 +27,6 @@
 
     //Default options and paths
         defaultOptions = {
-            autoLoad: false, //If true the getMessage will automatic load data
             domains : [
                 'niord-nw',   //All Danish navigational warnings are produced in the "niord-nw" domain.
                 'niord-nm',   //All Danish Notices to Mariners are produced in the "niord-nm" domain.
@@ -562,8 +561,7 @@
 
             switch (this.status){
                 case 'NOTHING':
-                    if (this.options.autoLoad)
-                        this.load(promiseOptions);
+                    this.load(promiseOptions);
                     break;
                 case 'LOADING':
                     /* Nothing - just wait */
@@ -760,7 +758,7 @@
                         };
 
                         //If it is not loading => load it
-                        if (this.options.autoLoad && (this.status == NOTHING))
+                        if (this.status == NOTHING)
                             this.load(promiseOptions);
                     }
             }
@@ -880,8 +878,8 @@
     Publications
     ************************************************************
     ***********************************************************/
-    ns.Publications = function(options){
-        this.options = $.extend( true, {}, defaultOptions, options || {} );
+    ns.Publications = function(/*options*/){
+        //this.options = $.extend( true, {}, defaultOptions, options || {} );
 
         this.init();
     };
@@ -919,15 +917,20 @@
     });
 
 
-    ns.messages = function(options){
-        return new ns.Messages(options);
-    };
-
-    ns.publications  = function(options){
-        return new ns.Publications(options);
-    };
 
 
+    /***********************************************************
+    ************************************************************
+    Global methods to get messages and publications
+    ************************************************************
+    ***********************************************************/
+    ns.load = function(options){
+        ns.messages      = new ns.Messages(options);
+        ns.publications  = new ns.Publications(/*options*/);
+
+        ns.messages.load();
+        ns.publications.load();
+    }
 
 }(jQuery, this, document));
 

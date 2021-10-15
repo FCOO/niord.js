@@ -7,8 +7,8 @@ Read and adjust messages from [Nautical Information Directory](https://niord.dma
 
 Create two global object constructor in namespace `window.Niord`:
 
-    window.Niord.messages(options)
-    window.Niord.publications(options)
+    window.Niord.Messages(options)
+    window.Niord.Publications()
 
 **NOTE This is version 3 with a different interface that version 2.x**
 
@@ -22,8 +22,13 @@ http://FCOO.github.io/niord.js/demo/ (see console)
 
 
 ## Usage
-    var myNiordMessages = window.Niord.messages({autoLoad: true});
+    window.Niord.load();
+    var myNiordMessages = window.Niord.messages;
     
+    //or create it individual        
+    //var myNiordMessages = new window.Niord.Messages();
+    //myNiordMessages.load();
+
     myNiordMessages.getMessages( 
         'FA FE', //domain. Can be "FA", "FE", "NW", NM" or combi of these 
         function( list, domain ){
@@ -63,7 +68,6 @@ http://FCOO.github.io/niord.js/demo/ (see console)
 ### options
 | Id | Type | Default | Description |
 | :--: | :--: | :-----: | --- |
-| `autoLoad` | `BOOLEAN` | `false` | If `true` the data are loaded automatic when a request is made. If `false` `load`-method must be called |
 | `domains` | `[]STRING` | `["niord-nw", "niord-nm", "niord-fa", "niord-fe"]` | Only for `Niord.messages`. See below |
 
 ### Domains
@@ -76,6 +80,7 @@ There are four groups/type of messages:
  
 
 ### Methods
+    window.Niord.load(options); //Create Niord.messages and Niord.publications and load the data
 
     window.Niord.messages
         .getMessages( domain, resolve, reject, promiseOptions );
