@@ -925,6 +925,9 @@
     ************************************************************
     ***********************************************************/
     ns.load = function(options){
+        if (ns.messages)
+            return;
+
         ns.messages      = new ns.Messages(options);
         ns.publications  = new ns.Publications(/*options*/);
 
