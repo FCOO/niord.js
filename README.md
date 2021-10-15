@@ -24,13 +24,13 @@ http://FCOO.github.io/niord.js/demo/ (see console)
 ## Usage
     window.Niord.load();
     var myNiordMessages = window.Niord.messages;
-    
-    //or create it individual        
+
+    //or create it individual
     //var myNiordMessages = new window.Niord.Messages();
     //myNiordMessages.load();
 
-    myNiordMessages.getMessages( 
-        'FA FE', //domain. Can be "FA", "FE", "NW", NM" or combi of these 
+    myNiordMessages.getMessages(
+        'FA FE', //domain. Can be "FA", "FE", "NW", NM" or combi of these
         function( list, domain ){
             //Do something with list
         },
@@ -39,7 +39,7 @@ http://FCOO.github.io/niord.js/demo/ (see console)
         }
     );
 
-    myNiordMessages.getMessage( 
+    myNiordMessages.getMessage(
         'NM-885-17', //id or short-id
         function( message ){
             //Do something with message
@@ -50,8 +50,8 @@ http://FCOO.github.io/niord.js/demo/ (see console)
     );
 
     var myNiordPublications = window.Niord.publications({autoLoad: true});
-    
-    myNiordPublications.getPublications( 
+
+    myNiordPublications.getPublications(
         function( list ){
             //Do something with list = []PUBLICATION
         },
@@ -59,7 +59,7 @@ http://FCOO.github.io/niord.js/demo/ (see console)
             //Error when loading the publications
         }
     );
-    
+
 
 
 
@@ -73,11 +73,11 @@ http://FCOO.github.io/niord.js/demo/ (see console)
 ### Domains
 There are four groups/type of messages:
 
-- `"nw"` All Danish navigational warnings are produced in the "niord-nw" domain.
-- `"nm"` All Danish Notices to Mariners are produced in the "niord-nm" domain.
-- `"fa"` All Danish firing areas are defined as miscellaneous Notices to Mariners in the "niord-fa" domain.
-- `"fe"` The actual firing exercises are maintained as local navigational warnings in the "niord-fe" domain.
- 
+- `"niord-nw"` All Danish navigational warnings are produced in the "niord-nw" domain.
+- `"niord-nm"` All Danish Notices to Mariners are produced in the "niord-nm" domain.
+- `"niord-fa"` All Danish firing areas are defined as miscellaneous Notices to Mariners in the "niord-fa" domain.
+- `"niord-fe"` The actual firing exercises are maintained as local navigational warnings in the "niord-fe" domain.
+
 
 ### Methods
     window.Niord.load(options); //Create Niord.messages and Niord.publications and load the data

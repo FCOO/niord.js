@@ -60,7 +60,7 @@
     domainUrl( domains ) - Return the url to retrive info from one or more domain(s)
     ********************************************/
     ns.domainUrl = function( domains ){
-        domains = $.isArray( domains ) ? domains : [domains];
+        domains = $.isArray( domains ) ? domains : domains.split(' ');
         return messagesUrl + dateFormatParam + domainParam + domains.join(domainParam);
     };
 
