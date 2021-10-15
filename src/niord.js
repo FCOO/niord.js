@@ -933,7 +933,7 @@
 
         ns.messages.load();
         ns.publications.load();
-    }
+    };
 
 }(jQuery, this, document));
 
