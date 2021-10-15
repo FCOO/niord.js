@@ -73,10 +73,10 @@ http://FCOO.github.io/niord.js/demo/ (see console)
 ### Domains
 There are four groups/type of messages:
 
-- `"niord-nw"` All Danish navigational warnings are produced in the "niord-nw" domain.
-- `"niord-nm"` All Danish Notices to Mariners are produced in the "niord-nm" domain.
-- `"niord-fa"` All Danish firing areas are defined as miscellaneous Notices to Mariners in the "niord-fa" domain.
-- `"niord-fe"` The actual firing exercises are maintained as local navigational warnings in the "niord-fe" domain.
+- `"nw"` All Danish navigational warnings are produced in the "niord-nw" domain.
+- `"nm"` All Danish Notices to Mariners are produced in the "niord-nm" domain.
+- `"fa"` All Danish firing areas are defined as miscellaneous Notices to Mariners in the "niord-fa" domain.
+- `"fe"` The actual firing exercises are maintained as local navigational warnings in the "niord-fe" domain.
  
 
 ### Methods
