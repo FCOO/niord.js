@@ -32,7 +32,11 @@
                 'nm',   //All Danish Notices to Mariners are produced in the "niord-nm" domain.
                 'fa',   //All Danish firing areas are defined as miscellaneous Notices to Mariners in the "niord-fa" domain.
                 'fe'    //The actual firing exercises are maintained as local navigational warnings in the "niord-fe" domain.
-            ]
+            ],
+
+            //loadingOn and loadingOff = functions to be called when single massage are loaded
+            loadingOn : function(){},
+            loadingOff: function(){},
         },
         baseUrl         = 'https://niord.dma.dk/rest/public/v1/',
         dateFormatParam = '?dateFormat=UNIX_EPOCH',
@@ -74,7 +78,7 @@
     messageUrl( id ) - Return the url to retrive info from a single message
     ********************************************/
     ns.messageUrl = function( id ){
-        return baseUrl + 'message/' + id + dateFormatParam;
+        return baseUrl + 'message/' + encodeURIComponent(id) + dateFormatParam;
     };
 
 
@@ -710,6 +714,8 @@
 
             if (!dontUpdateRef)
                 this._updateReferences();
+
+            return message;
         },
 
         /*************************************************
@@ -745,14 +751,19 @@
                 else
                     if (this.ready){
                         //The data are loaded and do not contain the message => Try to load the message via single-message request
+                        ns.options.loadingOn();
                         Promise.getJSON(
                             ns.messageUrl( id ),
                             promiseOptions || {},
                             function( data ){
                                 _this._addMessage( data );
+                                ns.options.loadingOff();
                                 return _this.getMessage(id, resolve);
                             },
-                            reject
+                            function() {
+                                ns.options.loadingOff();
+                                return reject.apply(this, arguments);
+                            }
                         );
                     }
                     else {
