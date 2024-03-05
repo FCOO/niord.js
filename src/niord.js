@@ -15,6 +15,13 @@
     //Create namespace
     var ns = window.Niord = window.Niord || {};
 
+    ns.options = {
+        //loadingOn and loadingOff = functions to be called when single massage are loaded
+        loadingOn : function(){},
+        loadingOff: function(){},
+    };
+
+
     //Define default error-handler (reject) and default options for promise.
     ns.defaultErrorHandler   = ns.defaultErrorHandler || null;
     ns.defaultPromiseOptions = ns.defaultPromiseOptions || {};
@@ -32,11 +39,7 @@
                 'nm',   //All Danish Notices to Mariners are produced in the "niord-nm" domain.
                 'fa',   //All Danish firing areas are defined as miscellaneous Notices to Mariners in the "niord-fa" domain.
                 'fe'    //The actual firing exercises are maintained as local navigational warnings in the "niord-fe" domain.
-            ],
-
-            //loadingOn and loadingOff = functions to be called when single massage are loaded
-            loadingOn : function(){},
-            loadingOff: function(){},
+            ]
         },
         baseUrl         = 'https://niord.dma.dk/rest/public/v1/',
         dateFormatParam = '?dateFormat=UNIX_EPOCH',
